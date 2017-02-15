@@ -27,7 +27,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	int option = 0;
 	DWORD PID;
 	SetPriv SeDebug;
-	
+
 	if (argc != 4)
 		usage(argv[0]);
 
@@ -40,7 +40,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	if (!PathFileExists(argv[2]))
 		usage(argv[0]);
-	
+
 	PID = _ttoi(argv[3]);
 
 	//Set SeDebugPriviliege
@@ -56,19 +56,19 @@ int _tmain(int argc, _TCHAR* argv[])
 		exit(1);
 	}
 	cout << "OK" << endl;
-	
+
 	if (option == 1) {
 		//DLL injection
 		HANDLE hProcess;
 		HMODULE hKernel32;
-		HANDLE hLoadLibrary; 
+		HANDLE hLoadLibrary;
 		LPVOID hAllocatedMem;
 		HANDLE hThread;
 		char dllpath[1024];
 		size_t i;
-		
+
 		wcstombs_s(&i, dllpath, 1024, argv[2], 1024);
-		
+
 		hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, PID);
 		if (hProcess == NULL)
 		{
@@ -76,7 +76,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			exit(1);
 		}
 		wcout << "Open process " << PID << ": OK" << endl;
-		
+
 		hKernel32 = GetModuleHandle(L"Kernel32");
 		if (hKernel32 == NULL)
 		{
@@ -129,7 +129,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		char *sc;
 
 		file.open(argv[2], ios::binary);
-		if (!file.is_open()) 
+		if (!file.is_open())
 		{
 			wcerr << "Cannot open the file " << argv[2] << endl;
 			exit(1);
@@ -138,7 +138,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		file.close();
 		sc = new char[line.size()+1];
 		sc = (char*)line.c_str();
-		
+
 		hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, PID);
 		if (hProcess == NULL)
 		{
@@ -147,7 +147,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 		wcout << "Open process " << PID << ": OK" << endl;
 
-		hAllocatedMem = VirtualAllocEx(hProcess, NULL, sizeof(sc), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+		hAllocatedMem = VirtualAllocEx(hProcess, NULL, sizeof(sc), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 		if (hAllocatedMem == NULL)
 		{
 			wcerr << "Cannot allocate memory in " << PID << ", error: " << GetLastError() << endl;
